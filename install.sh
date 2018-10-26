@@ -27,26 +27,27 @@ EOM
     yum -y install google-cloud-sdk kubectl
 fi
 
-echo -e "----------------------- login into ACCOUNT with: $account_name \n\n"
+echo -e "\n\n----------------------- login into ACCOUNT with: $account_name"
 gcloud auth login
 gcloud config set account $account_name
 
-echo -e "----------------------- creating project: $project_id \n\n"
+echo -e "\n\n----------------------- creating project: $project_id"
 gcloud projects create $project_id --name="$project_name"
 gcloud config set project $project_id
 
-echo -e "----------------------- Linking account to $project_name"
-gcloud alpha billing accounts projects link $project_name--billing-account
+echo -e "\n\n----------------------- Linking account to $project_name"
+gcloud beta billing projects link $project_id --billing-account=$billing_account
 
-echo -e "----------------------- enabling Kubernetes API (may take a while)\n\n"
+echo -e "\n\n----------------------- enabling Kubernetes API (may take a while)\n\n"
 gcloud services enable container.googleapis.com
 
-echo -e "----------------------- creating cluster: $cluster_name \n\n"
+echo -e "\n\n----------------------- creating cluster: $cluster_name \n\n"
 gcloud container clusters create $cluster_name --zone us-central1-a --project "$project_name"
 gcloud container clusters get-credentials $cluster_name --zone us-central1-a --project "$project_name"
 
-echo -e "----------------------- Installing package manager\n\n"
-echo ">>>>>> Installing Helm"
+echo -e "\n\n----------------------- Installing package manager\n\n"
+
+echo -e "\n\n>>>>>> Installing Helm"
 # installs helm with bash commands for easier command line integration
 curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get | bash
 # add a service account within a namespace to segregate tiller
@@ -56,23 +57,23 @@ kubectl create clusterrolebinding tiller \
     --clusterrole cluster-admin \
     --serviceaccount=kube-system:tiller
 
-echo ">>>>>> Initialize Helm in $cluster_name"
+echo -e "\n\n>>>>>> Initialize Helm in $cluster_name"
 # initialized helm within the tiller service account
 helm init --service-account tiller
 # updates the repos for Helm repo integration
 helm repo update
 
-echo ">>>>>> Veryfing Helm in $cluster_name"
+echo -e "\n\n>>>>>> Veryfing Helm in $cluster_name"
 # verify that helm is installed in the cluster
 kubectl get deploy,svc tiller-deploy -n kube-system
 
-echo -e "----------------------- Installing infra in $cluster_name\n\n"
+echo -e "\n\n----------------------- Installing infra in $cluster_name"
 
-echo ">>>>>> Installing knockout base"
-helm repo add knockout-infra https://github.com/fvalero86/knockout-cluster/knockout-infra/
+echo -e "\n\n>>>>>> Installing knockout base"
+helm repo add knockout-infra https://raw.githubusercontent.com/fvalero86/knockout-cluster/master/package/
 helm install --name knockout-cluster knockout-cluster
 
-echo ">>>>>> Installing monitoring"
+echo -e "\n\n>>>>>> Installing monitoring"
 helm repo add coreos https://s3-eu-west-1.amazonaws.com/coreos-charts/stable/
 helm install coreos/prometheus-operator --name prometheus-operator --namespace monitoring
 helm install coreos/kube-prometheus --name kube-prometheus --set global.rbacEnable=true --namespace monitoring
