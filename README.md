@@ -8,7 +8,7 @@
   * helm package manager.
   * tiller (helm server) installed on kubernetes.
 
-## Explanation
+## Explanation
 The installation platform for the test is based on a Kubernetes Cluster from Google Cloud.
 
 The script **install.sh** will set up the required services:
