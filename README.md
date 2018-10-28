@@ -17,7 +17,7 @@ The script **install.sh** will set up the required services:
 * Mysql
 * Prometheus / Alertmanager and Graphana (monitoring system)
 
-## Packages
+## Packages
 The **install.sh** script uses the helm package manager to install all the infra packages easily.
 
 ### Infra base
